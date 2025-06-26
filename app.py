@@ -2,28 +2,35 @@ import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import requests
 import time
 import random
 import os
-import requests
+
+# --- CONFIG TELEGRAM ---
+TELEGRAM_TOKEN = "7858429749:AAEpEhYqhZIZg1ixVRDOt1yyms83vwtA3zo"
+TELEGRAM_CHAT_ID = "7521702072"  
+
 
 def digita_devagar(elemento, texto):
     for letra in texto:
         elemento.send_keys(letra)
         time.sleep(random.uniform(0.1, 0.3))
 
-def enviar_whatsapp(mensagem):
+def enviar_telegram(mensagem):
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": mensagem
+    }
     try:
-        phone_number = "5511951562814"
-        api_key = "SEU_API_KEY_DO_CALLMEBOT"  # Substitua pelo seu token do CallMeBot
-        url = f"https://api.callmebot.com/whatsapp.php?phone={phone_number}&text={requests.utils.quote(mensagem)}&apikey={api_key}"
-        response = requests.get(url)
+        response = requests.post(url, json=payload)
         if response.status_code == 200:
-            print("✅ Notificação enviada via WhatsApp!")
+            print("✅ Mensagem enviada via Telegram!")
         else:
-            print(f"⚠️ Falha ao enviar WhatsApp: {response.text}")
+            print(f"⚠️ Falha ao enviar mensagem Telegram: {response.text}")
     except Exception as e:
-        print(f"❌ Erro ao enviar WhatsApp: {e}")
+        print(f"❌ Erro ao enviar Telegram: {e}")
 
 EMAIL = "senseregistros+brunoferreiradossantos@gmail.com"
 SENHA = "Cidadania10"
@@ -130,10 +137,12 @@ except Exception as e:
 
 finally:
     mensagem_final = "✅ Reservado com sucesso!" if encontrou else "❌ Nenhuma vaga encontrada."
-    enviar_whatsapp(mensagem_final)
+    enviar_telegram(mensagem_final)
 
     time.sleep(10)
     try:
         driver.quit()
     except:
         pass
+    print("✅ Navegador fechado.")
+    print("✅ Script finalizado.")
